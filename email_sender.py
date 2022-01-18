@@ -1,6 +1,7 @@
 import win32com.client as win32
 import os
 import datetime, time
+import ctypes
 
 CURRENT_PATH = os.getcwd()
 
@@ -38,20 +39,26 @@ mail.Subject = subject
 
 if file_name:
 
-    # ? xlsx file path
-    attachment  = CURRENT_PATH + '\\' + file_name
+    try:
+        # ? xlsx file path
+        attachment  = CURRENT_PATH + '\\' + file_name
 
-    mail.Attachments.Add(attachment)
-    mail.Send()
-    
-    # Move xlsx file into month folder once sent
-    time.sleep(1)
-    month_path = CURRENT_PATH + '\\' + current_month
-    if os.path.exists(month_path):
-        os.replace(attachment, month_path + '\\' + file_name)
-    else:
-        os.mkdir(month_path)
-        os.replace(attachment, month_path + '\\' + file_name)
+        mail.Attachments.Add(attachment)
+        mail.Send()
+        
+        # Move xlsx file into month folder once sent
+        time.sleep(1)
+        month_path = CURRENT_PATH + '\\' + current_month
+        if os.path.exists(month_path):
+            os.replace(attachment, month_path + '\\' + file_name)
+        else:
+            os.mkdir(month_path)
+            os.replace(attachment, month_path + '\\' + file_name)
+
+    # Windows message error if email is not sended
+    except Exception as e:
+        ctypes.windll.user32.MessageBoxW(0, "No se pudo enviar el correo VDE", "ERROR", 1)
+
 
 # Display outlook window with email parameters if xlsx file was not found, to prevent wrong emails
 else:
